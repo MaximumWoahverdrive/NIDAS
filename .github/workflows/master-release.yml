@@ -10,6 +10,9 @@ on:
     tags-ignore:
       - 'auto-release*'
 
+permissions:
+  contents: write
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -21,17 +24,10 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Build
         run: tar -cvf NIDAS.tar .shrc --exclude-from=tar-exclude.txt *
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: get_branch_name
-      - uses: meeDamian/github-release@v2.0.3
+      - uses: softprops/action-gh-release@v3
         with:
-          token: ${{ secrets.RELEASE_SECRET }}
           prerelease: false
-          gzip: false
           files: NIDAS.tar
-          allow_override: true
